@@ -8,7 +8,7 @@ from typing import Tuple
 
 from artifactory import ArtifactorySaaSPath  # type: ignore
 from build_download_helper import dowload_build_with_progress
-from git_helper import SHA_REGEXP, TAG_REGEXP, removeprefix, removesuffix
+from git_helper import TAG_REGEXP, commit, removeprefix, removesuffix
 
 
 # Necessary ENV variables
@@ -198,15 +198,6 @@ class Artifactory:
 
     def tgz_path(self, package_file: str) -> ArtifactorySaaSPath:
         return self.__path_helper("_tgz", package_file)
-
-
-def commit(name: str):
-    r = re.compile(SHA_REGEXP)
-    if not r.match(name):
-        raise argparse.ArgumentTypeError(
-            "commit hash should contain exactly 40 hex characters"
-        )
-    return name
 
 
 def parse_args() -> argparse.Namespace:
