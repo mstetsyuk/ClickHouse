@@ -47,19 +47,17 @@ class ClickHouseVersion:
         major: Union[int, str],
         minor: Union[int, str],
         patch: Union[int, str],
-        tweak: Union[int, str],
         revision: Union[int, str],
         git: Git,
     ):
         self._major = int(major)
         self._minor = int(minor)
         self._patch = int(patch)
-        self._tweak = int(tweak)
         self._revision = int(revision)
+        self._git = git
         self._string = ".".join(
             (str(self.major), str(self.minor), str(self.patch), str(self.tweak))
         )
-        self._git = git
         self._describe = ""
 
     def update(self, part: str) -> "ClickHouseVersion":
@@ -68,21 +66,16 @@ class ClickHouseVersion:
         return method()
 
     def major_update(self) -> "ClickHouseVersion":
-        return ClickHouseVersion(self.major + 1, 1, 1, 1, self.revision + 1, self._git)
+        return ClickHouseVersion(self.major + 1, 1, 1, self.revision + 1, self._git)
 
     def minor_update(self) -> "ClickHouseVersion":
         return ClickHouseVersion(
-            self.major, self.minor + 1, 1, 1, self.revision + 1, self._git
+            self.major, self.minor + 1, 1, self.revision + 1, self._git
         )
 
     def patch_update(self) -> "ClickHouseVersion":
         return ClickHouseVersion(
-            self.major, self.minor, self.patch + 1, 1, self.revision, self._git
-        )
-
-    def tweak_update(self) -> "ClickHouseVersion":
-        return ClickHouseVersion(
-            self.major, self.minor, self.patch, self.tweak + 1, self.revision, self._git
+            self.major, self.minor, self.patch + 1, self.revision, self._git
         )
 
     @property
@@ -99,7 +92,7 @@ class ClickHouseVersion:
 
     @property
     def tweak(self) -> int:
-        return self._tweak
+        return self._git.tweak
 
     @property
     def revision(self) -> int:
@@ -171,12 +164,10 @@ def get_version_from_repo(
     versions_path: str = FILE_WITH_VERSION_PATH,
 ) -> ClickHouseVersion:
     versions = read_versions(versions_path)
-    versions["tweak"] = git.tweak
     return ClickHouseVersion(
         versions["major"],
         versions["minor"],
         versions["patch"],
-        versions["tweak"],
         versions["revision"],
         git,
     )
@@ -277,8 +268,8 @@ def main():
     parser.add_argument(
         "--update",
         "-u",
-        choices=("major", "minor", "patch", "tweak"),
-        help="the version part to update",
+        choices=("major", "minor", "patch"),
+        help="the version part to update, tweak is always calculated from commits",
     )
     parser.add_argument(
         "--update-contributors",
