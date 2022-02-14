@@ -74,7 +74,7 @@ class Git:
             raise Exception(f"last tag {value} doesn't match the pattern")
 
     @property
-    def latest_tag(self):
+    def latest_tag(self) -> str:
         return self._latest_tag
 
     @latest_tag.setter
@@ -83,7 +83,7 @@ class Git:
         self._latest_tag = value
 
     @property
-    def new_tag(self):
+    def new_tag(self) -> str:
         return self._new_tag
 
     @new_tag.setter
@@ -92,7 +92,7 @@ class Git:
         self._new_tag = value
 
     @property
-    def tweak(self):
+    def tweak(self) -> int:
         if not self.latest_tag.endswith("-testing"):
             return self.commits_since_tag
 

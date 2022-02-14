@@ -208,10 +208,12 @@ def _update_changelog(repo_path: str, version: ClickHouseVersion):
     subprocess.check_call(cmd, shell=True)
 
 
-def update_contributors(relative_contributors_path: str = GENERATED_CONTRIBUTORS):
+def update_contributors(
+    relative_contributors_path: str = GENERATED_CONTRIBUTORS, force: bool = False
+):
     # Check if we have shallow checkout by comparing number of lines
     # '--is-shallow-repository' is in git since 2.15, 2017-10-30
-    if git.run("git rev-parse --is-shallow-repository") == "true":
+    if git.run("git rev-parse --is-shallow-repository") == "true" and not force:
         logging.warning("The repository is shallow, refusing to update contributors")
         return
 
