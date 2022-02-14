@@ -3,7 +3,6 @@ import datetime
 import logging
 import os.path as p
 import subprocess
-import sys
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from typing import Dict, Tuple, Union
 
@@ -285,9 +284,14 @@ def main():
         "--update-contributors",
         "-c",
         action="store_true",
-        help=f"update {GENERATED_CONTRIBUTORS} file, doesn't work on shallow repo",
+        help=f"update {GENERATED_CONTRIBUTORS} file and exit, "
+        "doesn't work on shallow repo",
     )
     args = parser.parse_args()
+
+    if args.update_contributors:
+        update_contributors()
+        return
 
     version = get_version_from_repo(args.version_path)
 
@@ -296,9 +300,6 @@ def main():
 
     if args.version_type:
         version.with_description(args.version_type)
-
-    if args.update_contributors:
-        update_contributors()
 
     if args.update:
         update_cmake_version(version)
