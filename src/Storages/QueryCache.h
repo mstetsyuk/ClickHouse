@@ -235,6 +235,7 @@ public:
         if (data == nullptr)
         {
             LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
+            pipe = Pipe();
             return;
         }
         LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is not nullptr");
