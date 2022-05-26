@@ -284,13 +284,13 @@ public:
     explicit QueryCache(size_t cache_size_in_bytes_)
         : cache(new Cache(cache_size_in_bytes_))
         , removal_scheduler()
-        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.get())
+        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache)
     {
     }
 
     CachePutHolder tryPutInCache(CacheKey cache_key)
     {
-        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache.get());
+        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache);
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
