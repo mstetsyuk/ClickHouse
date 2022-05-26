@@ -294,7 +294,7 @@ public:
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        return CacheReadHolder(cache.get(cache_key));
+        return CacheReadHolder(nullptr);
     }
 
     bool containsResult(CacheKey cache_key)
