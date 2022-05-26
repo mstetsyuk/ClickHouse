@@ -282,7 +282,7 @@ private:
     using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
 public:
     explicit QueryCache(size_t cache_size_in_bytes_)
-        : cache(std::make_unique<Cache>(cache_size_in_bytes_))
+        : cache(cache_size_in_bytes_)
         , removal_scheduler()
         , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.load().get())
     {
@@ -323,7 +323,7 @@ public:
 
 
 private:
-    const std::atomic<std::shared_ptr<Cache>> cache;
+    Cache cache;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
