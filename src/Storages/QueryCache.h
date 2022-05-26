@@ -323,7 +323,7 @@ public:
 
 
 private:
-    const std::unique_ptr<Cache> cache;
+    const std::shared_ptr<Cache> cache;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
