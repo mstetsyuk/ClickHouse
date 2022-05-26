@@ -282,15 +282,15 @@ private:
     using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
 public:
     explicit QueryCache(size_t cache_size_in_bytes_)
-        : cache(new Cache(cache_size_in_bytes_))
+        : cache(std::make_unique<Cache>(cache_size_in_bytes_))
         , removal_scheduler()
-        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache)
+        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.get())
     {
     }
 
     CachePutHolder tryPutInCache(CacheKey cache_key)
     {
-        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache);
+        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache.get());
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
@@ -313,7 +313,6 @@ public:
     {
         removal_scheduler.stopProcessingRemovalQueue();
         cache_removing_thread.join();
-        delete cache;
     }
 
     size_t recordQueryRun(CacheKey cache_key)
@@ -324,7 +323,7 @@ public:
 
 
 private:
-    Cache * cache;
+    const std::unique_ptr<Cache> cache;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
