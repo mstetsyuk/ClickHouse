@@ -234,8 +234,10 @@ public:
     {
         if (data == nullptr)
         {
+            LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
             return;
         }
+        LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is not nullptr");
 
         pipe = Pipe(std::make_shared<SourceFromSingleChunk>(data->first, toSingleChunk(data->second)));
     }
@@ -291,7 +293,9 @@ public:
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        return CacheReadHolder(cache->get(cache_key));
+        auto data = cache->get(cache_key);
+        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "data is nullptr == {}", (data == nullptr));
+        return CacheReadHolder(data);
     }
 
     bool containsResult(CacheKey cache_key)
