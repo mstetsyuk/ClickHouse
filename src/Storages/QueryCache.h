@@ -284,19 +284,17 @@ public:
     explicit QueryCache(size_t cache_size_in_bytes_)
         : cache(cache_size_in_bytes_)
         , removal_scheduler()
-        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.load().get())
+        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, &cache)
     {
     }
 
     CachePutHolder tryPutInCache(CacheKey cache_key)
     {
-        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache.load().get());
+        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        auto & c = *(cache.load());
-        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "efvwe : {}", cache_key.header.rows(), c.maxSize());
-        return CacheReadHolder(nullptr);
+        return CacheReadHolder(cache.get(cache_key));
     }
 
     bool containsResult(CacheKey cache_key)
