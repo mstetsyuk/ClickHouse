@@ -227,55 +227,55 @@ private:
     QueryWeightFunction query_weight;
 };
 
-class CacheReadHolder
-{
-private:
-    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
-public:
-    explicit CacheReadHolder(std::shared_ptr<Data> data)
-    {
-        if (data == nullptr)
-        {
-            LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
-            pipe = Pipe();
-            return;
-        }
-        LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is not nullptr");
-        pipe = Pipe(std::make_shared<SourceFromSingleChunk>(data->first, toSingleChunk(data->second)));
-    }
-
-    bool containsResult() const
-    {
-        return false; // !pipe.empty();
-    }
-
-    Pipe && getPipe()
-    {
-        return std::move(pipe);
-    }
-
-private:
-    static Chunk toSingleChunk(const Chunks& chunks)
-    {
-        if (chunks.empty())
-        {
-            return {};
-        }
-        auto result_columns = chunks[0].clone().mutateColumns();
-        for (size_t i = 1; i != chunks.size(); ++i)
-        {
-            auto columns = chunks[i].getColumns();
-            for (size_t j = 0; j != columns.size(); ++j)
-            {
-                result_columns[j]->insertRangeFrom(*columns[j], 0, columns[j]->size());
-            }
-        }
-        const size_t num_rows = result_columns[0]->size();
-        return Chunk(std::move(result_columns), num_rows);
-    }
-
-    Pipe pipe;
-};
+//class CacheReadHolder
+//{
+//private:
+//    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
+//public:
+//    explicit CacheReadHolder(std::shared_ptr<Data> data)
+//    {
+//        if (data == nullptr)
+//        {
+//            LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
+//            pipe = Pipe();
+//            return;
+//        }
+//        LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is not nullptr");
+//        pipe = Pipe(std::make_shared<SourceFromSingleChunk>(data->first, toSingleChunk(data->second)));
+//    }
+//
+//    bool containsResult() const
+//    {
+//        return false; // !pipe.empty();
+//    }
+//
+//    Pipe && getPipe()
+//    {
+//        return std::move(pipe);
+//    }
+//
+//private:
+//    static Chunk toSingleChunk(const Chunks& chunks)
+//    {
+//        if (chunks.empty())
+//        {
+//            return {};
+//        }
+//        auto result_columns = chunks[0].clone().mutateColumns();
+//        for (size_t i = 1; i != chunks.size(); ++i)
+//        {
+//            auto columns = chunks[i].getColumns();
+//            for (size_t j = 0; j != columns.size(); ++j)
+//            {
+//                result_columns[j]->insertRangeFrom(*columns[j], 0, columns[j]->size());
+//            }
+//        }
+//        const size_t num_rows = result_columns[0]->size();
+//        return Chunk(std::move(result_columns), num_rows);
+//    }
+//
+//    Pipe pipe;
+//};
 
 class QueryCache
 {
