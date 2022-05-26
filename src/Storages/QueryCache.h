@@ -232,9 +232,8 @@ class CacheReadHolder
 private:
     using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
 public:
-    explicit CacheReadHolder(Cache * cache, CacheKey cacheKey)
+    explicit CacheReadHolder(std::shared_ptr<Data> data)
     {
-        std::shared_ptr<Data> data = cache->get(cacheKey);
         if (data == nullptr)
         {
             LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
@@ -242,7 +241,6 @@ public:
             return;
         }
         LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is not nullptr");
-
         pipe = Pipe(std::make_shared<SourceFromSingleChunk>(data->first, toSingleChunk(data->second)));
     }
 
@@ -296,18 +294,21 @@ public:
         return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
     }
 
-    CacheReadHolder tryReadFromCache(CacheKey cache_key)
+    std::shared_ptr<Data> tryReadFromCache(CacheKey cache_key)
     {
-        return CacheReadHolder(&cache, cache_key);
+//        return CacheReadHolder(cache.get(cache_key));
+          return cache.get(cache_key);
     }
 
     bool containsResult(CacheKey cache_key)
     {
+        std::lock_guard lock(mutex);
         return cache.get(cache_key) != nullptr;
     }
 
     void reset()
     {
+        std::lock_guard lock(mutex);
         cache.reset();
     }
 
@@ -325,8 +326,8 @@ public:
 
 
 private:
-//    std::mutex cache_mutex;
     Cache cache;
+    std::mutex cache_mutex;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
