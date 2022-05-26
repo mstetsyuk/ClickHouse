@@ -284,29 +284,29 @@ public:
     explicit QueryCache(size_t cache_size_in_bytes_)
         : cache(std::make_unique<Cache>(cache_size_in_bytes_))
         , removal_scheduler()
-        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.get())
+        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, cache.load().get())
     {
     }
 
     CachePutHolder tryPutInCache(CacheKey cache_key)
     {
-        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache.get());
+        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, cache.load().get());
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        auto & c = *cache;
+        auto & c = *(cache.load());
         LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "efvwe : {}", cache_key.header.rows(), c.maxSize());
         return CacheReadHolder(nullptr);
     }
 
     bool containsResult(CacheKey cache_key)
     {
-        return cache->get(cache_key) != nullptr;
+        return cache.load()->get(cache_key) != nullptr;
     }
 
     void reset()
     {
-        cache->reset();
+        cache.load()->reset();
     }
 
     ~QueryCache()
@@ -323,7 +323,7 @@ public:
 
 
 private:
-    const std::shared_ptr<Cache> cache;
+    const std::atomic<std::shared_ptr<Cache>> cache;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
