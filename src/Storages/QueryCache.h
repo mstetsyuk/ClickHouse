@@ -299,12 +299,12 @@ public:
 
     bool containsResult(CacheKey cache_key)
     {
-        return cache.load()->get(cache_key) != nullptr;
+        return cache.get(cache_key) != nullptr;
     }
 
     void reset()
     {
-        cache.load()->reset();
+        cache.reset();
     }
 
     ~QueryCache()
