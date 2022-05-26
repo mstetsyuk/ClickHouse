@@ -649,16 +649,16 @@ void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
                                         : std::make_optional<String>(context->getUserName())
                                     };
 
-//    if (auto cache_holder = context->getQueryCache()->tryReadFromCache(query_cache_key);
-//        cache_holder.containsResult() && context->getSettingsRef().query_cache_passive_usage)
-//    {
-//        auto read_from_cache_step = std::make_unique<ReadFromPreparedSource>(cache_holder.getPipe());
-//        read_from_cache_step->setStepDescription("Read query result from cache");
-//        query_plan.addStep(std::move(read_from_cache_step));
-//        return;
-//    }
+    if (auto cache_holder = context->getQueryCache()->tryReadFromCache(query_cache_key);
+        cache_holder.containsResult() && context->getSettingsRef().query_cache_passive_usage)
+    {
+        auto read_from_cache_step = std::make_unique<ReadFromPreparedSource>(cache_holder.getPipe());
+        read_from_cache_step->setStepDescription("Read query result from cache");
+        query_plan.addStep(std::move(read_from_cache_step));
+        return;
+    }
     executeImpl(query_plan, std::move(input_pipe));
-    executePutInCache(query_plan, std::move(query_cache_key));
+//    executePutInCache(query_plan, std::move(query_cache_key));
     /// We must guarantee that result structure is the same as in getSampleBlock()
     ///
     /// But if it's a projection query, plan header does not match result_header.
