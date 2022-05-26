@@ -295,7 +295,7 @@ public:
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
         auto data = nullptr; //cache->get(cache_key);
-        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "data is nullptr == {}", (data == nullptr));
+        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "ignore the following: {}", (cache_key.username));
         return CacheReadHolder(data);
     }
 
