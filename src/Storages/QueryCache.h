@@ -242,7 +242,7 @@ public:
 
     bool containsResult() const
     {
-        return true; // !pipe.empty();
+        return false; // !pipe.empty();
     }
 
     Pipe && getPipe()
