@@ -294,7 +294,7 @@ public:
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        std::cout << std::static_cast<uintptr_t>(&cache_key) << std::endl;
+        std::cout << static_cast<uintptr_t>(&cache_key) << std::endl;
         return CacheReadHolder(nullptr);
     }
 
