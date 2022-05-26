@@ -296,7 +296,7 @@ public:
 
     Cache * tryReadFromCache()
     {
-        return cache.get(cacheKey);
+        return &cache;
     }
 
     bool containsResult(CacheKey cache_key)
