@@ -294,10 +294,10 @@ public:
         return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
     }
 
-    std::shared_ptr<Data> tryReadFromCache(CacheKey cache_key)
+    Cache * tryReadFromCache()
     {
 //        return CacheReadHolder(cache.get(cache_key));
-          return cache.get(cache_key);
+          return &cache;
     }
 
     bool containsResult(CacheKey cache_key)
