@@ -302,13 +302,11 @@ public:
 
     bool containsResult(CacheKey cache_key)
     {
-        std::lock_guard lock(mutex);
         return cache.get(cache_key) != nullptr;
     }
 
     void reset()
     {
-        std::lock_guard lock(mutex);
         cache.reset();
     }
 
