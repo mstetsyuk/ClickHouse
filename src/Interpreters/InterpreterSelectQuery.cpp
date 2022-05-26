@@ -650,7 +650,7 @@ void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
                                     };
 
     if (auto cache_holder = context->getQueryCache()->tryReadFromCache();
-        cache_holder->get(query_cache_key) && context->getSettingsRef().query_cache_passive_usage)
+        cache_holder->get(query_cache_key) && cache_holder->get(query_cache_key) && cache_holder->get(query_cache_key) && context->getSettingsRef().query_cache_passive_usage)
     {
 //        auto read_from_cache_step = std::make_unique<ReadFromPreparedSource>(cache_holder.getPipe());
 //        read_from_cache_step->setStepDescription("Read query result from cache");
