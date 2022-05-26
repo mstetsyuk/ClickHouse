@@ -229,9 +229,12 @@ private:
 
 class CacheReadHolder
 {
+private:
+    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
 public:
-    explicit CacheReadHolder(std::shared_ptr<Data> data)
+    explicit CacheReadHolder(Cache * cache, CacheKey cacheKey)
     {
+        std::shared_ptr<Data> data = cache->get(cacheKey);
         if (data == nullptr)
         {
             LOG_DEBUG(&Poco::Logger::get("CacheReadHolder()"), "data is nullptr");
@@ -293,9 +296,9 @@ public:
         return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
     }
 
-    CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        std::cout << cache_key.username.has_value() << std::endl;
-        return CacheReadHolder(nullptr);
+    CacheReadHolder tryReadFromCache(CacheKey cache_key)
+    {
+        return CacheReadHolder(&cache, cache_key);
     }
 
     bool containsResult(CacheKey cache_key)
@@ -322,6 +325,7 @@ public:
 
 
 private:
+//    std::mutex cache_mutex;
     Cache cache;
 
     CacheRemovalScheduler removal_scheduler;
