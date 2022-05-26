@@ -658,7 +658,7 @@ void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
 //        return;
 //    }
     executeImpl(query_plan, std::move(input_pipe));
-//    executePutInCache(query_plan, std::move(query_cache_key));
+    executePutInCache(query_plan, std::move(query_cache_key));
     /// We must guarantee that result structure is the same as in getSampleBlock()
     ///
     /// But if it's a projection query, plan header does not match result_header.
