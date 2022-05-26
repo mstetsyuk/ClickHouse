@@ -294,8 +294,9 @@ public:
     }
 
     CacheReadHolder tryReadFromCache(CacheKey cache_key) {
-        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "efvwe : {}", cache_key.header.rows());
-        return CacheReadHolder(cache->get(cache_key));
+        auto & c = *cache;
+        LOG_DEBUG(&Poco::Logger::get("QueryCache::CacheReadHolder"), "efvwe : {}, {}", cache_key.header.rows(), c.maxSize());
+        return CacheReadHolder(nullptr);
     }
 
     bool containsResult(CacheKey cache_key)

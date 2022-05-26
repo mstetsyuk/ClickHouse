@@ -46,10 +46,7 @@ public:
 
     MappedPtr get(const Key & key)
     {
-//        LOG_DEBUG(&Poco::Logger::get("LRUCache::get"), "acquiring lock ...");
-//        std::lock_guard lock(mutex);
-//        LOG_DEBUG(&Poco::Logger::get("LRUCache::get"), "acquired lock");
-
+        std::lock_guard lock(mutex);
 
         auto res = getImpl(key, lock);
         if (res)
