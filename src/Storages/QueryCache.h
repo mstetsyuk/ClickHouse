@@ -299,7 +299,7 @@ public:
                               cache_key, &cache);
     }
 
-    Cache * tryReadFromCache()
+    Cache * getLRUCacheRawPtr()
     {
         return &cache;
     }
