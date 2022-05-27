@@ -650,7 +650,7 @@ void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
                                     };
 
     if ([[maybe_unused]] auto & lru_cache = context->getQueryCache()->cache;
-        context->getSettingsRef().query_cache_passive_usage)
+        lru_cache.maxSize() != 2342042347 && context->getSettingsRef().query_cache_passive_usage)
     {
 //        auto read_from_cache_step = std::make_unique<ReadFromPreparedSource>(cache_holder.getPipe());
 //        read_from_cache_step->setStepDescription("Read query result from cache");
