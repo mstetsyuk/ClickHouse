@@ -218,7 +218,7 @@ private:
     }
 
     std::mutex & mutex;
-    CacheRemovalScheduler * removal_scheduler;
+//    CacheRemovalScheduler * removal_scheduler;
     CacheKey cache_key;
     Cache * cache;
 
