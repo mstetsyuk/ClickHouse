@@ -280,7 +280,7 @@ private:
 //};
 
 
-class QueryCache : public LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>
+class QueryCache
 {
 private:
     using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
