@@ -623,23 +623,23 @@ InterpreterSelectQuery::InterpreterSelectQuery(
     sanitizeBlock(result_header, true);
 }
 
-void InterpreterSelectQuery::executePutInCache(QueryPlan & query_plan, CacheKey query_cache_key)
-{
-    auto settings = context->getSettingsRef();
-    QueryCachePtr query_cache = context->getQueryCache();
-    size_t num_query_runs = query_cache->recordQueryRun(query_cache_key);
-
-    if (!settings.query_cache_active_usage || query_cache->containsResult(query_cache_key)
-        || num_query_runs < settings.min_query_runs_before_caching)
-    {
-        return;
-    }
-
-    auto caching_step = std::make_unique<CachingStep>(query_plan.getCurrentDataStream(),
-                                                      context->getQueryCache(), query_cache_key);
-    caching_step->setStepDescription("Put query result in cache");
-    query_plan.addStep(std::move(caching_step));
-}
+//void InterpreterSelectQuery::executePutInCache(QueryPlan & query_plan, CacheKey query_cache_key)
+//{
+//    auto settings = context->getSettingsRef();
+//    QueryCachePtr query_cache = context->getQueryCache();
+//    size_t num_query_runs = query_cache->recordQueryRun(query_cache_key);
+//
+//    if (!settings.query_cache_active_usage || query_cache->containsResult(query_cache_key)
+//        || num_query_runs < settings.min_query_runs_before_caching)
+//    {
+//        return;
+//    }
+//
+//    auto caching_step = std::make_unique<CachingStep>(query_plan.getCurrentDataStream(),
+//                                                      context->getQueryCache(), query_cache_key);
+//    caching_step->setStepDescription("Put query result in cache");
+//    query_plan.addStep(std::move(caching_step));
+//}
 
 void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
 {
