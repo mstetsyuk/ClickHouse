@@ -292,12 +292,14 @@ public:
     {
     }
 
-//    CachePutHolder tryPutInCache(CacheKey cache_key)
-//    {
-//        return CachePutHolder(put_in_cache_mutexes[cache_key],
-////                              &removal_scheduler,
-//                              cache_key, &cache);
-//    }
+    CachePutHolder tryPutInCache(CacheKey cache_key)
+    {
+        return CachePutHolder(put_in_cache_mutexes[cache_key],
+//                              &removal_scheduler,
+                              cache_key,
+                              this // &cache
+                              );
+    }
 
 //    Cache * getLRUCacheRawPtr()
 //    {
