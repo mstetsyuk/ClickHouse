@@ -314,11 +314,11 @@ public:
 //        cache.reset();
 //    }
 
-    ~QueryCache()
-    {
-//        removal_scheduler.stopProcessingRemovalQueue();
-//        cache_removing_thread.join();
-    }
+//    ~QueryCache()
+//    {
+////        removal_scheduler.stopProcessingRemovalQueue();
+////        cache_removing_thread.join();
+//    }
 
     size_t recordQueryRun(CacheKey cache_key)
     {
