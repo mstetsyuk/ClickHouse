@@ -165,67 +165,67 @@ private:
     std::mutex mutex;
 };
 
-class CachePutHolder
-{
-private:
-    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
-public:
-    CachePutHolder(std::mutex & mutex_, CacheRemovalScheduler * removal_scheduler_, CacheKey cache_key_, Cache * cache_)
-        : mutex(mutex_)
-        , removal_scheduler(removal_scheduler_)
-        , cache_key(cache_key_)
-        , cache(cache_)
-        , data(std::move(cache->getOrSet(cache_key, [&] { return std::make_shared<Data>(cache_key_.header, Chunks{}); }).first))
-    {
-        tryAcquire();
-    }
-
-    ~CachePutHolder()
-    {
-        if (executing_put_in_cache.load())
-        {
-            mutex.unlock();
-            removal_scheduler->scheduleRemoval(std::chrono::milliseconds{cache_key.settings.query_cache_entry_put_timeout}, cache_key);
-        }
-    }
-
-
-    void insertChunk(Chunk && chunk)
-    {
-        if (!fits_into_memory || !executing_put_in_cache.load())
-        {
-            return;
-        }
-        data = cache->get(cache_key);
-        data->second.push_back(std::move(chunk));
-
-        if (query_weight(*data) > cache_key.settings.max_query_cache_entry_size)
-        {
-            cache->remove(cache_key);
-            fits_into_memory = false;
-        }
-        cache->set(cache_key, data); // evicts cache if necessary, the entry with key=cache_key will not get evicted
-    }
-
-private:
-    bool tryAcquire()
-    {
-        bool result = mutex.try_lock();
-        executing_put_in_cache.store(result);
-        return result;
-    }
-
-    std::mutex & mutex;
-    CacheRemovalScheduler * removal_scheduler;
-    CacheKey cache_key;
-    Cache * cache;
-
-    std::atomic<bool> executing_put_in_cache{false};
-    bool fits_into_memory = true;
-    std::shared_ptr<Data> data;
-
-    QueryWeightFunction query_weight;
-};
+//class CachePutHolder
+//{
+//private:
+//    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
+//public:
+//    CachePutHolder(std::mutex & mutex_, CacheRemovalScheduler * removal_scheduler_, CacheKey cache_key_, Cache * cache_)
+//        : mutex(mutex_)
+//        , removal_scheduler(removal_scheduler_)
+//        , cache_key(cache_key_)
+//        , cache(cache_)
+//        , data(std::move(cache->getOrSet(cache_key, [&] { return std::make_shared<Data>(cache_key_.header, Chunks{}); }).first))
+//    {
+//        tryAcquire();
+//    }
+//
+//    ~CachePutHolder()
+//    {
+//        if (executing_put_in_cache.load())
+//        {
+//            mutex.unlock();
+//            removal_scheduler->scheduleRemoval(std::chrono::milliseconds{cache_key.settings.query_cache_entry_put_timeout}, cache_key);
+//        }
+//    }
+//
+//
+//    void insertChunk(Chunk && chunk)
+//    {
+//        if (!fits_into_memory || !executing_put_in_cache.load())
+//        {
+//            return;
+//        }
+//        data = cache->get(cache_key);
+//        data->second.push_back(std::move(chunk));
+//
+//        if (query_weight(*data) > cache_key.settings.max_query_cache_entry_size)
+//        {
+//            cache->remove(cache_key);
+//            fits_into_memory = false;
+//        }
+//        cache->set(cache_key, data); // evicts cache if necessary, the entry with key=cache_key will not get evicted
+//    }
+//
+//private:
+//    bool tryAcquire()
+//    {
+//        bool result = mutex.try_lock();
+//        executing_put_in_cache.store(result);
+//        return result;
+//    }
+//
+//    std::mutex & mutex;
+//    CacheRemovalScheduler * removal_scheduler;
+//    CacheKey cache_key;
+//    Cache * cache;
+//
+//    std::atomic<bool> executing_put_in_cache{false};
+//    bool fits_into_memory = true;
+//    std::shared_ptr<Data> data;
+//
+//    QueryWeightFunction query_weight;
+//};
 
 //class CacheReadHolder
 //{
@@ -277,7 +277,8 @@ private:
 //    Pipe pipe;
 //};
 
-class QueryCache
+
+class QueryCache : public LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>
 {
 private:
     using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
@@ -285,29 +286,29 @@ public:
     explicit QueryCache(size_t cache_size_in_bytes_)
         : cache(cache_size_in_bytes_)
         , removal_scheduler()
-        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, &cache)
+        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, this)
     {
     }
 
-    CachePutHolder tryPutInCache(CacheKey cache_key)
-    {
-        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
-    }
+//    CachePutHolder tryPutInCache(CacheKey cache_key)
+//    {
+//        return CachePutHolder(put_in_cache_mutexes[cache_key], &removal_scheduler, cache_key, &cache);
+//    }
 
-    Cache * tryReadFromCache()
-    {
-        return &cache;
-    }
+//    Cache * tryReadFromCache()
+//    {
+//        return &cache;
+//    }
 
-    bool containsResult(CacheKey cache_key)
-    {
-        return cache.get(cache_key) != nullptr;
-    }
+//    bool containsResult(CacheKey cache_key)
+//    {
+//        return cache.get(cache_key) != nullptr;
+//    }
 
-    void reset()
-    {
-        cache.reset();
-    }
+//    void reset()
+//    {
+//        cache.reset();
+//    }
 
     ~QueryCache()
     {
@@ -323,8 +324,7 @@ public:
 
 
 private:
-    Cache cache;
-    std::mutex cache_mutex;
+//    Cache cache;
 
     CacheRemovalScheduler removal_scheduler;
     std::thread cache_removing_thread;
