@@ -649,8 +649,8 @@ void InterpreterSelectQuery::buildQueryPlan(QueryPlan & query_plan)
                                         : std::make_optional<String>(context->getUserName())
                                     };
 
-    if (auto & lru_cache = context->getQueryCache()->cache;
-        lru_cache.get(query_cache_key) != nullptr && context->getSettingsRef().query_cache_passive_usage)
+    if ([[maybe_unused]] auto & lru_cache = context->getQueryCache()->cache;
+        context->getSettingsRef().query_cache_passive_usage)
     {
 //        auto read_from_cache_step = std::make_unique<ReadFromPreparedSource>(cache_holder.getPipe());
 //        read_from_cache_step->setStepDescription("Read query result from cache");
