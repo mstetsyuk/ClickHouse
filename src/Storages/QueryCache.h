@@ -303,16 +303,16 @@ public:
 //    {
 //        return &cache;
 //    }
+//
+//    bool containsResult(CacheKey cache_key)
+//    {
+//        return cache.get(cache_key) != nullptr;
+//    }
 
-    bool containsResult(CacheKey cache_key)
-    {
-        return cache.get(cache_key) != nullptr;
-    }
-
-    void reset()
-    {
-        cache.reset();
-    }
+//    void reset()
+//    {
+//        cache.reset();
+//    }
 
     ~QueryCache()
     {
