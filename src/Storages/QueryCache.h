@@ -327,7 +327,6 @@ public:
     }
 
 
-private:
     Cache cache;
 
 //    CacheRemovalScheduler removal_scheduler;
