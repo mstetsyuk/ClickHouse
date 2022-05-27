@@ -280,13 +280,13 @@ private:
 //};
 
 
-class QueryCache
+class QueryCache : public LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>
 {
 private:
-    using Cache = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
+    using Base = LRUCache<CacheKey, Data, CacheKeyHasher, QueryWeightFunction>;
 public:
     explicit QueryCache(size_t cache_size_in_bytes_)
-        : cache(cache_size_in_bytes_)
+        : Base(cache_size_in_bytes_)
 //        , removal_scheduler()
 //        , cache_removing_thread(&CacheRemovalScheduler::processRemovalQueue<Cache>, &removal_scheduler, this)
     {
@@ -299,10 +299,10 @@ public:
                               cache_key, &cache);
     }
 
-    Cache * getLRUCacheRawPtr()
-    {
-        return &cache;
-    }
+//    Cache * getLRUCacheRawPtr()
+//    {
+//        return &cache;
+//    }
 
     bool containsResult(CacheKey cache_key)
     {
@@ -327,7 +327,7 @@ public:
     }
 
 
-    Cache cache;
+//    Cache cache;
 
 //    CacheRemovalScheduler removal_scheduler;
 //    std::thread cache_removing_thread;
